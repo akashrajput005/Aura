@@ -40,6 +40,15 @@ export default async function Home(props: { searchParams: Promise<any> }) {
   const hasDbUrl = !!process.env.DATABASE_URL;
   const hasClerkKey = !!process.env.CLERK_SECRET_KEY;
 
+  // Diagnostic URL structure check
+  let dbUrlSnippet = "NONE";
+  if (hasDbUrl) {
+    const raw = process.env.DATABASE_URL || "";
+    dbUrlSnippet = `${raw.substring(0, 10)}...${raw.substring(raw.length - 10)}`;
+    if (raw.startsWith('"') || raw.startsWith("'")) dbUrlSnippet += " [⚠️ STARTS WITH QUOTE]";
+    if (raw.includes("DATABASE_URL=")) dbUrlSnippet += " [⚠️ INCLUDES PREFIX]";
+  }
+
   return (
     <div className="flex flex-col min-h-screen gradient-bg">
       <Header />
@@ -55,6 +64,7 @@ export default async function Home(props: { searchParams: Promise<any> }) {
             <span>Events: <span className="text-white">{dbStats.events}</span></span>
             <span className="hidden md:inline">• Env: {hasDbUrl ? "DB_OK" : "DB_MISSING"} | {hasClerkKey ? "CLERK_OK" : "CLERK_MISSING"}</span>
           </div>
+          <div className="text-[8px] opacity-40 lowercase">URL Masked: {dbUrlSnippet}</div>
           {dbStats.error && (
             <div className="text-red-400 normal-case bg-red-400/10 px-4 py-1 rounded-md border border-red-400/20 max-w-2xl text-center">
               ⚠️ Connection Error: {dbStats.error}
