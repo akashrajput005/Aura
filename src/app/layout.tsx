@@ -10,8 +10,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "VibeGuard | Experience with Purpose",
-  description: "Join the community. Find your vibe. Stay safe.",
+  title: "Aura | Don't Just Attend. Belong.",
+  description: "Aura is the first social discovery platform building a better world. Join the community. Find your vibe. Stay safe.",
   icons: {
     icon: "/favicon.ico",
   },
