@@ -61,15 +61,15 @@ export async function bootstrapAura() {
                             organizerId: admin.id
                         },
                         {
-                            title: 'Aura Genesis: The VIP Experience',
-                            description: 'The official launch event for our cosmic community. Network with the best curators and builders.',
+                            title: 'Google I/O Extended - Aura Edition',
+                            description: 'Join the local developer community for an official I/O Extended experience. Deep dives into AI, Web, and the future of Aura.',
                             location: 'Aura Digital Arena, Bangalore',
                             imageUrl: 'https://images.unsplash.com/photo-1540575861501-7ad0582373f3?q=80&w=1080',
                             startDateTime: new Date(Date.now() + 86400000), // Tomorrow
                             endDateTime: new Date(Date.now() + 172800000), // Day after
                             price: '0',
                             isFree: true,
-                            url: '#',
+                            url: 'https://events.google.com/io',
                             categoryId: techCat.id,
                             organizerId: admin.id
                         }
