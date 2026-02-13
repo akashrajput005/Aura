@@ -13,12 +13,6 @@ export default async function TrendingEvents({ city, searchText }: { city: strin
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* SERPER DIAGNOSTIC (Only visible to admin) */}
-            {!process.env.SERPER_API_KEY && (
-                <div className="col-span-full bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] p-2 rounded-xl mb-4 font-mono">
-                    ⚠️ Aura Discovery Diagnostic: SERPER_API_KEY is missing in environment. Falling back to curated data.
-                </div>
-            )}
 
             {externalEvents.length > 0 ? (
                 externalEvents.map((event: any) => (

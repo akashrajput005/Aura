@@ -5,8 +5,8 @@ const Footer = () => {
         <footer className="border-t border-white/10 bg-background py-12">
             <div className="wrapper flex flex-col md:flex-row items-center justify-between gap-8 px-6 md:px-12">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                    <p className="text-white/40 text-[10px] uppercase tracking-widest bg-white/5 px-4 py-1 rounded-full border border-white/10">
-                        © 2026 Aura Galaxy • <span className="text-primary font-bold">Build: v2.0-RECOVERY</span>
+                    <p className="text-white/40 text-sm">
+                        © 2026 Aura Galaxy. All orbits reserved.
                     </p>
                 </div>
 
