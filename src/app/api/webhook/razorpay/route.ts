@@ -16,20 +16,41 @@ export async function POST(req: Request) {
     if (expectedSignature === signature) {
         const event = JSON.parse(body);
 
+        console.log('Razorpay Webhook Event:', event.event);
+
+        if (event.event === 'order.paid') {
+            const order = event.payload.order.entity;
+            const eventId = order.notes?.eventId;
+            const buyerId = order.notes?.buyerId;
+            const totalAmount = (order.amount / 100).toString();
+
+            if (eventId && buyerId) {
+                try {
+                    // This is a backup fulfillment in case client-side verification fails
+                    await db.order.upsert({
+                        where: { stripeId: order.id },
+                        update: {},
+                        create: {
+                            stripeId: order.id,
+                            eventId: eventId,
+                            buyerId: buyerId,
+                            totalAmount: totalAmount,
+                        },
+                    });
+                    console.log('Webhook Fulfillment Success for Order:', order.id);
+                } catch (err) {
+                    console.error('Webhook DB Error:', err);
+                }
+            }
+        }
+
         if (event.event === 'payment.captured') {
-            const payment = event.payload.payment.entity;
-            const order_id = payment.order_id;
-            const notes = payment.notes; // Razorpay metadata is usually in notes
-
-            // We can also use the orders entity to get metadata if notes are empty
-            // For now, we'll rely on the verification action during checkout,
-            // but the webhook is a good fallback for reliable fulfillment.
-
-            console.log('Payment Captured:', payment.id);
+            console.log('Payment Captured Event processed:', event.payload.payment.entity.id);
         }
 
         return NextResponse.json({ status: 'ok' });
     } else {
+        console.error('Webhook Signature Mismatch. Check RAZORPAY_WEBHOOK_SECRET.');
         return NextResponse.json({ status: 'verification_failed' }, { status: 400 });
     }
 }
