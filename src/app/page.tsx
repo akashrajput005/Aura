@@ -15,6 +15,7 @@ import { CollectionSkeleton } from "@/components/shared/EventSkeleton";
 import VibeMatch from "@/components/shared/VibeMatch";
 import GuardianSOS from "@/components/shared/GuardianSOS";
 import EcoCredits from "@/components/shared/EcoCredits";
+import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -28,9 +29,29 @@ export default async function Home(props: { searchParams: Promise<any> }) {
   // Bootstrap initial data if needed (runs in background)
   bootstrapAura();
 
+  let dbStats = { users: 0, events: 0 };
+  try {
+    dbStats.users = await db.user.count();
+    dbStats.events = await db.event.count();
+  } catch (e) {
+    console.error("Diagnostic count failed", e);
+  }
+
   return (
     <div className="flex flex-col min-h-screen gradient-bg">
       <Header />
+
+      {/* PERSISTENT PRODUCTION MONITOR */}
+      <div className="bg-primary/10 border-b border-primary/20 py-2">
+        <div className="wrapper px-6 md:px-12 flex justify-center gap-6 text-[10px] font-mono text-primary uppercase tracking-widest">
+          <span>Database: <span className={dbStats.users > 0 ? "text-emerald-400" : "text-red-400"}>{dbStats.users > 0 ? "CONNECTED" : "EMPTY/ERROR"}</span></span>
+          <span>•</span>
+          <span>Users: <span className="text-white">{dbStats.users}</span></span>
+          <span>•</span>
+          <span>Events: <span className="text-white">{dbStats.events}</span></span>
+          <span className="hidden md:inline">• Mode: PROD-RECOVERY</span>
+        </div>
+      </div>
 
       <main className="flex-1">
         {/* Hero Section */}

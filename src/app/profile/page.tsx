@@ -77,6 +77,18 @@ const ProfilePage = async (props: { searchParams: Promise<{ [key: string]: strin
 
             <Header />
 
+            {/* PERSISTENT PRODUCTION MONITOR */}
+            <div className="bg-primary/10 border-b border-primary/20 py-2">
+                <div className="wrapper px-6 md:px-12 flex justify-center gap-6 text-[10px] font-mono text-primary uppercase tracking-widest">
+                    <span>Session: <span className="text-emerald-400">READY</span></span>
+                    <span>•</span>
+                    <span>User: <span className="text-white">{user.username}</span></span>
+                    <span>•</span>
+                    <span>Sync: <span className="text-emerald-400">ACTIVE</span></span>
+                    <span className="hidden md:inline">• ID: {user.id}</span>
+                </div>
+            </div>
+
             <main className="flex-1 space-y-32 pb-40 relative z-10">
                 {/* 1. Aura Galaxy Hero / Profile Section */}
                 <AnimatedSection delay={0.1}>
