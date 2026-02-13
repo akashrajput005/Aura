@@ -6,12 +6,12 @@ const Footer = () => {
             <div className="wrapper flex flex-col md:flex-row items-center justify-between gap-8 px-6 md:px-12">
                 <Link href="/" className="flex items-center gap-2">
                     <span className="text-xl font-bold text-white tracking-tight">
-                        Vibe<span className="text-primary">Guard</span>
+                        Aura
                     </span>
                 </Link>
 
                 <p className="text-muted-foreground text-sm">
-                    &copy; 2026 VibeGuard. Built for the next generation of experiences.
+                    &copy; 2026 Aura. Built for the next generation of experiences.
                 </p>
 
                 <div className="flex items-center gap-6">
