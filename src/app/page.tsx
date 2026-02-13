@@ -29,13 +29,16 @@ export default async function Home(props: { searchParams: Promise<any> }) {
   // Bootstrap initial data if needed (runs in background)
   bootstrapAura();
 
-  let dbStats = { users: 0, events: 0 };
+  let dbStats = { users: 0, events: 0, error: "" };
   try {
     dbStats.users = await db.user.count();
     dbStats.events = await db.event.count();
-  } catch (e) {
-    console.error("Diagnostic count failed", e);
+  } catch (e: any) {
+    dbStats.error = e.message || "Unknown Connection Error";
   }
+
+  const hasDbUrl = !!process.env.DATABASE_URL;
+  const hasClerkKey = !!process.env.CLERK_SECRET_KEY;
 
   return (
     <div className="flex flex-col min-h-screen gradient-bg">
@@ -43,13 +46,20 @@ export default async function Home(props: { searchParams: Promise<any> }) {
 
       {/* PERSISTENT PRODUCTION MONITOR */}
       <div className="bg-primary/10 border-b border-primary/20 py-2">
-        <div className="wrapper px-6 md:px-12 flex justify-center gap-6 text-[10px] font-mono text-primary uppercase tracking-widest">
-          <span>Database: <span className={dbStats.users > 0 ? "text-emerald-400" : "text-red-400"}>{dbStats.users > 0 ? "CONNECTED" : "EMPTY/ERROR"}</span></span>
-          <span>•</span>
-          <span>Users: <span className="text-white">{dbStats.users}</span></span>
-          <span>•</span>
-          <span>Events: <span className="text-white">{dbStats.events}</span></span>
-          <span className="hidden md:inline">• Mode: PROD-RECOVERY</span>
+        <div className="wrapper px-6 md:px-12 flex flex-col items-center gap-2 text-[10px] font-mono text-primary uppercase tracking-widest">
+          <div className="flex justify-center gap-6">
+            <span>Database: <span className={dbStats.users > 0 ? "text-emerald-400" : "text-red-400"}>{dbStats.users > 0 ? "CONNECTED" : "FAILED"}</span></span>
+            <span>•</span>
+            <span>Users: <span className="text-white">{dbStats.users}</span></span>
+            <span>•</span>
+            <span>Events: <span className="text-white">{dbStats.events}</span></span>
+            <span className="hidden md:inline">• Env: {hasDbUrl ? "DB_OK" : "DB_MISSING"} | {hasClerkKey ? "CLERK_OK" : "CLERK_MISSING"}</span>
+          </div>
+          {dbStats.error && (
+            <div className="text-red-400 normal-case bg-red-400/10 px-4 py-1 rounded-md border border-red-400/20 max-w-2xl text-center">
+              ⚠️ Connection Error: {dbStats.error}
+            </div>
+          )}
         </div>
       </div>
 
