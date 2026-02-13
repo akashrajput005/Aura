@@ -16,6 +16,8 @@ import VibeMatch from "@/components/shared/VibeMatch";
 import GuardianSOS from "@/components/shared/GuardianSOS";
 import EcoCredits from "@/components/shared/EcoCredits";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
   const page = Number(searchParams?.page) || 1;
@@ -70,18 +72,15 @@ export default async function Home(props: { searchParams: Promise<any> }) {
         </section>
 
         {/* Aura Discovery Section (Suspended) */}
-        <section className="wrapper py-10 px-6 md:px-12">
+        <section id="discovery" className="wrapper py-10 px-6 md:px-12">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
             <h2 className="text-3xl font-bold text-white flex items-center gap-3">
               <MapPin className="text-primary w-8 h-8" />
               Trending Near {city}
             </h2>
-            <p className="text-muted-foreground mt-2 max-w-xl">
-              Global Discovery: Discover events happening around you on verified partner platforms.
-            </p>
             <div className="flex flex-wrap gap-2">
               {['Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Pune'].map((cityName) => (
-                <Link key={cityName} href={`/?city=${cityName}#events`} scroll={false}>
+                <Link key={cityName} href={`/?city=${cityName}#discovery`} scroll={false}>
                   <Badge variant={city === cityName ? "default" : "outline"} className="cursor-pointer px-4 py-1">
                     {cityName}
                   </Badge>
@@ -89,6 +88,9 @@ export default async function Home(props: { searchParams: Promise<any> }) {
               ))}
             </div>
           </div>
+          <p className="text-muted-foreground mb-8 max-w-xl">
+            Global Discovery: Real-time events from partner platforms in {city}.
+          </p>
 
           <Suspense key={city} fallback={<CollectionSkeleton />}>
             <TrendingEvents city={city} searchText={searchText} />

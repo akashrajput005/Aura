@@ -4,13 +4,14 @@ import { db } from "@/lib/db";
 
 export async function bootstrapAura() {
     try {
+        console.log("[Bootstrap] Checking Aura ecosystem status...");
         const categoryCount = await db.category.count();
         const categoryNames = [
             'Music', 'Nightlife', 'Workshops', 'Wellness', 'Tech', 'Art & Culture', 'Sports', 'Networking', 'Hackathons'
         ];
 
         if (categoryCount < categoryNames.length) {
-            console.log("Bootstrapping categories...");
+            console.log(`[Bootstrap] Categories missing (${categoryCount}/${categoryNames.length}). Syncing...`);
             for (const name of categoryNames) {
                 await db.category.upsert({
                     where: { name },
@@ -18,16 +19,17 @@ export async function bootstrapAura() {
                     create: { name },
                 });
             }
-            console.log("Categories bootstrapped.");
+            console.log("[Bootstrap] Categories fully synced.");
         }
 
         const eventCount = await db.event.count();
         if (eventCount === 0) {
-            console.log("Database empty. Bootstrapping initial Aura ecosystem...");
+            console.log("[Bootstrap] Database empty. Seeding initial events...");
 
             // 1. Ensure System Admin exists
             let admin = await db.user.findUnique({ where: { email: 'hello@aura.com' } });
             if (!admin) {
+                console.log("[Bootstrap] Creating system admin...");
                 admin = await db.user.create({
                     data: {
                         clerkId: 'system_admin_aura',
@@ -44,7 +46,7 @@ export async function bootstrapAura() {
             const techCat = await db.category.findUnique({ where: { name: 'Tech' } });
 
             if (admin && musicCat && techCat) {
-                console.log("Seeding Aura Gold Standard Events...");
+                console.log("[Bootstrap] Creating Gold Standard Events...");
                 await db.event.createMany({
                     data: [
                         {
@@ -75,10 +77,12 @@ export async function bootstrapAura() {
                         }
                     ]
                 });
-                console.log("Seeding complete.");
+                console.log("[Bootstrap] Aura seeded successfully.");
             }
+        } else {
+            console.log(`[Bootstrap] ${eventCount} events found. Ecosystem active.`);
         }
     } catch (error) {
-        console.error("Bootstrap failed:", error);
+        console.error("[Bootstrap] Critical failure:", error);
     }
 }
