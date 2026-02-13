@@ -8,12 +8,7 @@ import { Calendar, MapPin, User, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CheckoutButton from "@/components/shared/CheckoutButton";
 import Collection from "@/components/shared/Collection";
-import dynamic from "next/dynamic";
-
-const EventMap = dynamic(() => import("../../../components/shared/EventMap"), {
-    ssr: false,
-    loading: () => <div className="h-[400px] w-full bg-white/5 animate-pulse rounded-3xl mt-10 border border-white/10" />
-});
+import EventMapWrapper from "@/components/shared/EventMapWrapper";
 
 const EventDetails = async (props: {
     params: Promise<{ id: string }>,
@@ -95,7 +90,7 @@ const EventDetails = async (props: {
                             <p className="p-medium-16 lg:p-regular-18 truncate text-primary underline mt-2">{event.url}</p>
                         </div>
 
-                        <EventMap location={event.location} />
+                        <EventMapWrapper location={event.location} />
                     </div>
                 </div>
             </section>
