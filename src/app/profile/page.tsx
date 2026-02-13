@@ -9,7 +9,7 @@ import React from 'react'
 import Header from "@/components/shared/Header";
 import Footer from "@/components/shared/Footer";
 
-const ProfilePage = async (props: { searchParams: Promise<any> }) => {
+const ProfilePage = async (props: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) => {
     const searchParams = await props.searchParams;
     const { userId: clerkId } = await auth();
 

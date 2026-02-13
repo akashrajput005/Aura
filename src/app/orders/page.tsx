@@ -4,7 +4,7 @@ import { formatDateTime, formatPrice } from '@/lib/utils'
 import Header from "@/components/shared/Header";
 import Footer from "@/components/shared/Footer";
 
-const Orders = async (props: { searchParams: Promise<any> }) => {
+const Orders = async (props: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) => {
     const searchParams = await props.searchParams;
     const eventId = (searchParams?.eventId as string) || ''
     const searchText = (searchParams?.query as string) || ''
