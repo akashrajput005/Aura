@@ -8,8 +8,18 @@ export function cn(...inputs: ClassValue[]) {
 
 export const convertFileToUrl = (file: File) => URL.createObjectURL(file)
 
-export const formatDateTime = (dateString: Date) => {
-  // ... existing implementation ...
+export const formatDateTime = (dateString: Date | string | number) => {
+  const date = dateString ? new Date(dateString) : new Date();
+
+  // Check for invalid date
+  if (isNaN(date.getTime())) {
+    return {
+      dateTime: 'N/A',
+      dateOnly: 'N/A',
+      timeOnly: 'N/A',
+    }
+  }
+
   const dateTimeOptions: Intl.DateTimeFormatOptions = {
     weekday: 'short',
     month: 'short',
@@ -33,9 +43,9 @@ export const formatDateTime = (dateString: Date) => {
     hour12: true,
   }
 
-  const formattedDateTime: string = new Date(dateString).toLocaleString('en-US', dateTimeOptions)
-  const formattedDate: string = new Date(dateString).toLocaleString('en-US', dateOptions)
-  const formattedTime: string = new Date(dateString).toLocaleString('en-US', timeOptions)
+  const formattedDateTime: string = date.toLocaleString('en-US', dateTimeOptions)
+  const formattedDate: string = date.toLocaleString('en-US', dateOptions)
+  const formattedTime: string = date.toLocaleString('en-US', timeOptions)
 
   return {
     dateTime: formattedDateTime,
@@ -44,11 +54,11 @@ export const formatDateTime = (dateString: Date) => {
   }
 }
 
-export const formatPrice = (price: string) => {
-  const amount = parseFloat(price)
+export const formatPrice = (price: string, currency: string = 'INR') => {
+  const amount = parseFloat(price) || 0
   const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: currency,
   }).format(amount)
 
   return formatted

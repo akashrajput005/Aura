@@ -20,6 +20,29 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+# Aura Galaxy: The Cosmic Event Hub 🚀
+
+**Aura Galaxy** is a state-of-the-art event discovery and management platform designed for the next generation of curators and builders. It blends premium aesthetics with AI-powered networking and eco-conscious gamification.
+
+---
+
+## ✨ High-Fidelity Features
+
+*   🌌 **Galaxy Dashboard**: A unified, interactive profile experience with real-time cosmic assets.
+*   🛡️ **Aura Vault**: A specialized financial hub integrating transaction ledgers and Eco Credits.
+*   🧠 **AI Crew-Match**: Intelligent micro-crew formation based on interest frequencies.
+*   🧭 **Cosmic Quests**: Gamified earning system for users and builders.
+*   🌱 **Eco-Conscious**: Incentives for carpooling and green participation.
+
+## 🛠️ Cosmic Tech Stack
+
+*   **Framework**: Next.js 15 (App Router)
+*   **Styling**: Tailwind CSS + Framer Motion (Glassmorphism)
+*   **Auth**: Clerk Security
+*   **Database**: MongoDB + Prisma ORM
+*   **Payments**: Razorpay (India-First Integration)
+*   **AI**: Automated Crew Matching & Discovery Insights
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

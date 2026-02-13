@@ -8,7 +8,7 @@ export const headerLinks = [
         route: '/events/create',
     },
     {
-        label: 'My Profile',
+        label: 'Aura Galaxy',
         route: '/profile',
     },
 ]
@@ -22,6 +22,7 @@ export const eventDefaultValues = {
     endDateTime: new Date(),
     categoryId: '',
     price: '',
+    currency: 'INR',
     isFree: false,
     url: '',
 }

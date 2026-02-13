@@ -1,6 +1,10 @@
-import stripe from 'stripe';
+import Stripe from 'stripe';
 import { NextResponse } from 'next/server';
 import { createOrder } from '@/lib/actions/order.actions';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2023-10-16' as any,
+});
 
 export const dynamic = 'force-dynamic';
 
@@ -26,11 +30,10 @@ export async function POST(request: Request) {
         const { id, amount_total, metadata } = event.data.object;
 
         const order = {
-            stripeId: id,
+            razorpayOrderId: id,
             eventId: metadata?.eventId || '',
             buyerId: metadata?.buyerId || '',
             totalAmount: amount_total ? (amount_total / 100).toString() : '0',
-            createdAt: new Date(),
         };
 
         const newOrder = await createOrder(order);

@@ -24,11 +24,16 @@ const Header = () => {
 
                 <div className="flex w-32 justify-end gap-3">
                     <SignedIn>
-                        <UserButton afterSignOutUrl="/" appearance={{
-                            elements: {
-                                userButtonAvatarBox: "w-10 h-10 rounded-xl border-2 border-primary/50"
-                            }
-                        }} />
+                        <UserButton
+                            afterSignOutUrl="/"
+                            userProfileMode="navigation"
+                            userProfileUrl="/profile"
+                            appearance={{
+                                elements: {
+                                    userButtonAvatarBox: "w-10 h-10 rounded-xl border-2 border-primary/50"
+                                }
+                            }}
+                        />
                         <MobileNav />
                     </SignedIn>
                     <SignedOut>

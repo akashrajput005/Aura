@@ -4,6 +4,12 @@ import { db } from "@/lib/db";
 
 export async function createCategory({ categoryName }: { categoryName: string }) {
     try {
+        const existingCategory = await db.category.findUnique({
+            where: { name: categoryName },
+        });
+
+        if (existingCategory) return JSON.parse(JSON.stringify(existingCategory));
+
         const newCategory = await db.category.create({
             data: { name: categoryName },
         });

@@ -1,20 +1,40 @@
+"use server";
+
 import Razorpay from 'razorpay';
 import { db } from "@/lib/db";
+import crypto from 'crypto';
 
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID!,
-    key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
+const getRazorpayInstance = () => {
+    const key_id = process.env.RAZORPAY_KEY_ID;
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!key_id || !key_secret) {
+        throw new Error("Razorpay API keys are missing. Please check your .env file.");
+    }
+
+    return new Razorpay({
+        key_id,
+        key_secret,
+    });
+};
 
 export const createRazorpayOrder = async (order: any) => {
-    const amount = order.isFree ? 0 : Number(order.price) * 100;
+    // Ensure amount is a valid number and at least 0
+    const price = parseFloat(order.price) || 0;
+    const amount = order.isFree ? 0 : Math.round(price * 100);
+
+    // If it's a free event, we don't need a Razorpay order
+    if (amount === 0) {
+        return { id: 'free_event', amount: 0, currency: "INR" };
+    }
 
     try {
+        const razorpay = getRazorpayInstance();
         const options = {
             amount: amount,
             currency: "INR",
-            receipt: `receipt_${Date.now()}`,
-            metadata: {
+            receipt: `receipt_${Date.now()}`.slice(0, 40), // Receipt limit is 40 chars
+            notes: { // Use notes instead of metadata for simpler key-value pairs if needed
                 eventId: order.eventId,
                 buyerId: order.buyerId,
             }
@@ -22,26 +42,38 @@ export const createRazorpayOrder = async (order: any) => {
 
         const razorpayOrder = await razorpay.orders.create(options);
         return JSON.parse(JSON.stringify(razorpayOrder));
-    } catch (error) {
-        console.error(error);
-        throw error;
+    } catch (error: any) {
+        console.error("Razorpay Order Error Details:", {
+            message: error.message,
+            description: error.description,
+            code: error.code,
+            metadata: error.metadata
+        });
+        throw new Error(error.description || error.message || "Failed to create Razorpay order");
     }
 }
 
 export async function createOrder(order: { razorpayOrderId: string, eventId: string, buyerId: string, totalAmount: string }) {
     try {
+        if (!order.buyerId || !order.eventId || !order.razorpayOrderId) {
+            console.error("Missing required fields for order creation:", order);
+            throw new Error("Missing required order information (Buyer, Event, or Transaction ID).");
+        }
+
         const newOrder = await db.order.create({
             data: {
-                stripeId: order.razorpayOrderId, // We'll use stripeId field for razorpay id for now to avoid schema changes
+                stripeId: order.razorpayOrderId,
                 eventId: order.eventId,
                 buyerId: order.buyerId,
                 totalAmount: order.totalAmount,
             },
         });
 
+        console.log("Order Created Successfully:", newOrder.id);
         return JSON.parse(JSON.stringify(newOrder));
-    } catch (error) {
-        console.log(error);
+    } catch (error: any) {
+        console.error("Database Order Creation Error:", error);
+        throw new Error(error.message || "Failed to save order to database.");
     }
 }
 
@@ -53,8 +85,17 @@ export async function verifyRazorpayPayment({
     buyerId,
     totalAmount
 }: any) {
-    const crypto = await import('crypto');
-    const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!);
+    // Handle Free Events (Skip Signature Check)
+    if (razorpay_order_id === 'free_event') {
+        return await createOrder({
+            razorpayOrderId: 'free_event_' + Date.now(),
+            eventId,
+            buyerId,
+            totalAmount: '0'
+        });
+    }
+
+    const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || '');
     hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
     const generated_signature = hmac.digest('hex');
 
@@ -66,7 +107,7 @@ export async function verifyRazorpayPayment({
             totalAmount
         });
     } else {
-        throw new Error("Payment verification failed");
+        throw new Error("Payment verification failed: Signature mismatch");
     }
 }
 
@@ -119,6 +160,7 @@ export async function getOrdersByUser({ userId, limit = 3, page }: { userId: str
         return {
             data: JSON.parse(JSON.stringify(orders)),
             totalPages: Math.ceil(ordersCount / limit),
+            totalCount: ordersCount,
         };
     } catch (error) {
         console.log(error);

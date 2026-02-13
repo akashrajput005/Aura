@@ -52,11 +52,14 @@ const Collection = ({
           )} */}
                 </div>
             ) : (
-                <div className="flex-center wrapper min-h-[200px] w-full flex-col gap-3 rounded-[20px] bg-grey-50 py-28 text-center border border-white/10 glassmorphism">
+                <div className="flex-center wrapper min-h-[300px] w-full flex-col gap-3 rounded-3xl border border-white/10 bg-white/5 py-28 text-center backdrop-blur-sm">
+                    <div className="p-4 rounded-full bg-primary/10 mb-2">
+                        <svg className="w-12 h-12 text-primary opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                    </div>
                     <h3 className="p-bold-20 md:h3-bold text-white">{emptyTitle}</h3>
-                    <p className="p-regular-14 text-muted-foreground">
-                        {emptyStateSubtext}
-                    </p>
+                    <p className="p-regular-14 text-white/50 max-w-md mx-auto">{emptyStateSubtext}</p>
                 </div>
             )}
         </>

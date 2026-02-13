@@ -32,6 +32,25 @@ const Checkout = ({ event, userId }: { event: any, userId: string }) => {
         try {
             const razorpayOrder = await createRazorpayOrder(orderData);
 
+            if (!razorpayOrder || !razorpayOrder.id) {
+                alert("Failed to initialize payment. Please try again.");
+                return;
+            }
+
+            // Handle Free Events
+            if (razorpayOrder.id === 'free_event') {
+                await verifyRazorpayPayment({
+                    razorpay_order_id: 'free_event',
+                    razorpay_payment_id: 'free_event',
+                    razorpay_signature: 'free_event', // verifyRazorpayPayment needs to be updated to handle this
+                    eventId: event.id,
+                    buyerId: userId,
+                    totalAmount: '0'
+                });
+                window.location.href = `${window.location.origin}/profile?success=true`;
+                return;
+            }
+
             const options = {
                 key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_SFelKm9QhHUCXh",
                 amount: razorpayOrder.amount,
@@ -50,7 +69,7 @@ const Checkout = ({ event, userId }: { event: any, userId: string }) => {
                         window.location.href = `${window.location.origin}/profile?success=true`;
                     } catch (error) {
                         console.error("Verification failed", error);
-                        alert("Payment verification failed. Please contact support.");
+                        alert("Payment verification failed. Your ticket might still be processing. Please check your profile.");
                     }
                 },
                 prefill: {
@@ -60,13 +79,19 @@ const Checkout = ({ event, userId }: { event: any, userId: string }) => {
                 },
                 theme: {
                     color: "#624CF5"
+                },
+                modal: {
+                    ondismiss: function () {
+                        console.log("Checkout closed");
+                    }
                 }
             };
 
             const rzp = new (window as any).Razorpay(options);
             rzp.open();
-        } catch (error) {
-            console.error("Checkout failed", error);
+        } catch (error: any) {
+            console.error("Checkout failed:", error);
+            alert(error.message || "An unexpected error occurred during checkout.");
         }
     }
 

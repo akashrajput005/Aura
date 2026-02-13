@@ -22,6 +22,12 @@ export async function createEvent({ event, userId, path }: any) {
 
 export async function getEventById(eventId: string) {
     try {
+        // Simple regex check for MongoDB ObjectId (24 hex chars)
+        if (!/^[0-9a-fA-D]{24}$/.test(eventId)) {
+            console.log("Invalid Event ID format:", eventId);
+            return null;
+        }
+
         const event = await db.event.findUnique({
             where: { id: eventId },
             include: {
@@ -30,9 +36,10 @@ export async function getEventById(eventId: string) {
             },
         });
 
-        return JSON.parse(JSON.stringify(event));
+        return event ? JSON.parse(JSON.stringify(event)) : null;
     } catch (error) {
-        console.log(error);
+        console.log("getEventById error:", error);
+        return null;
     }
 }
 
@@ -96,6 +103,11 @@ export async function updateEvent({ userId, event, path }: any) {
 
 export async function getRelatedEventsByCategory({ categoryId, eventId, limit = 3, page }: any) {
     try {
+        // Validation: If categoryId is missing or not a valid ObjectID, return empty result instead of crashing Prisma
+        if (!categoryId || !/^[0-9a-fA-D]{24}$/.test(categoryId)) {
+            return { data: [], totalPages: 0 };
+        }
+
         const skipAmount = (Number(page) - 1) * limit;
 
         const where = {
@@ -145,6 +157,7 @@ export async function getEventsByUser({ userId, limit = 6, page }: any) {
         return {
             data: JSON.parse(JSON.stringify(events)),
             totalPages: Math.ceil(eventsCount / limit),
+            totalCount: eventsCount,
         };
     } catch (error) {
         console.log(error);

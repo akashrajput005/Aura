@@ -12,6 +12,13 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { eventFormSchema } from "@/lib/validator";
 import { eventDefaultValues } from "@/constants";
 import Dropdown from "./Dropdown";
@@ -37,6 +44,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
     const [files, setFiles] = useState<File[]>([]);
     const initialValues = event && type === "Update" ? {
         ...event,
+        currency: event.currency || 'INR',
         startDateTime: new Date(event.startDateTime),
         endDateTime: new Date(event.endDateTime),
     } : eventDefaultValues;
@@ -46,7 +54,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
 
     const form = useForm<z.infer<typeof eventFormSchema>>({
         resolver: zodResolver(eventFormSchema),
-        defaultValues: initialValues,
+        defaultValues: initialValues as z.infer<typeof eventFormSchema>,
     });
 
     async function onSubmit(values: z.infer<typeof eventFormSchema>) {
@@ -262,6 +270,49 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                                             {...field}
                                             className="p-regular-16 border-0 bg-transparent outline-offset-0 focus:border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                                         />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="currency"
+                                            render={({ field: currencyField }) => (
+                                                <FormItem>
+                                                    <Select onValueChange={currencyField.onChange} defaultValue={currencyField.value}>
+                                                        <FormControl>
+                                                            <SelectTrigger className="w-[80px] border-0 bg-transparent focus:ring-0">
+                                                                <SelectValue placeholder="INR" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent className="bg-white">
+                                                            <SelectItem value="INR">₹ INR</SelectItem>
+                                                            <SelectItem value="USD">$ USD</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-xs text-primary hover:bg-primary/10 mr-2"
+                                            onClick={() => {
+                                                const currentPrice = parseFloat(form.getValues('price'));
+                                                const currentCurrency = form.getValues('currency');
+                                                if (isNaN(currentPrice)) return;
+
+                                                if (currentCurrency === 'INR') {
+                                                    form.setValue('price', (currentPrice / 83).toFixed(2));
+                                                    form.setValue('currency', 'USD');
+                                                } else {
+                                                    form.setValue('price', (currentPrice * 83).toFixed(0));
+                                                    form.setValue('currency', 'INR');
+                                                }
+                                            }}
+                                        >
+                                            Convert
+                                        </Button>
+
                                         <FormField
                                             control={form.control}
                                             name="isFree"

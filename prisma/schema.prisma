@@ -18,6 +18,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  auraPoints  Int      @default(0)
+  ecoCredits Int      @default(0)
+  streak     Int      @default(0)
+
   events Event[]
   orders Order[]
 }
@@ -31,6 +35,7 @@ model Event {
   startDateTime DateTime @default(now())
   endDateTime   DateTime @default(now())
   price       String
+  currency    String   @default("INR")
   isFree      Boolean  @default(false)
   url         String?
   

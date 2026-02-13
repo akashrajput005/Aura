@@ -5,6 +5,7 @@ import { generateClientDropzoneAccept } from "uploadthing/client";
 import { Button } from "@/components/ui/button";
 import { convertFileToUrl } from "@/lib/utils";
 import { useState, useCallback, Dispatch, SetStateAction } from "react";
+import SafeImage from "./SafeImage";
 
 type FileUploaderProps = {
     imageUrl: string;
@@ -36,11 +37,9 @@ export function FileUploader({
 
             {imageUrl ? (
                 <div className="flex h-full w-full flex-1 justify-center ">
-                    <img
+                    <SafeImage
                         src={imageUrl}
                         alt="image"
-                        width={250}
-                        height={250}
                         className="w-full object-cover object-center"
                     />
                 </div>
