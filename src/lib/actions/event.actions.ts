@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 
 export async function createEvent({ event, userId, path }: any) {
     try {
+        if (!userId) throw new Error("User ID is required to create an event.");
+
         const newEvent = await db.event.create({
             data: {
                 ...event,
@@ -15,8 +17,9 @@ export async function createEvent({ event, userId, path }: any) {
         revalidatePath(path);
 
         return JSON.parse(JSON.stringify(newEvent));
-    } catch (error) {
-        console.log(error);
+    } catch (error: any) {
+        console.error("Create Event Error:", error);
+        throw new Error(error.message || "Failed to create event.");
     }
 }
 
@@ -88,6 +91,12 @@ export async function deleteEvent({ eventId, path }: { eventId: string, path: st
 
 export async function updateEvent({ userId, event, path }: any) {
     try {
+        const eventToUpdate = await db.event.findUnique({ where: { id: event.id } });
+
+        if (!eventToUpdate || eventToUpdate.organizerId !== userId) {
+            throw new Error("Unauthorized: Only the host can update this vibe.");
+        }
+
         const updatedEvent = await db.event.update({
             where: { id: event.id },
             data: { ...event },
@@ -96,8 +105,9 @@ export async function updateEvent({ userId, event, path }: any) {
         revalidatePath(path);
 
         return JSON.parse(JSON.stringify(updatedEvent));
-    } catch (error) {
-        console.log(error);
+    } catch (error: any) {
+        console.error("Update Event Error:", error);
+        throw new Error(error.message || "Failed to update event.");
     }
 }
 

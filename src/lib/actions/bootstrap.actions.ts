@@ -5,49 +5,78 @@ import { db } from "@/lib/db";
 export async function bootstrapAura() {
     try {
         const categoryCount = await db.category.count();
-        if (categoryCount === 0) {
-            console.log("Bootstrapping categories...");
-            const categoryNames = [
-                'Music', 'Nightlife', 'Workshops', 'Wellness', 'Tech', 'Art & Culture', 'Sports', 'Networking', 'Hackathons'
-            ];
+        const categoryNames = [
+            'Music', 'Nightlife', 'Workshops', 'Wellness', 'Tech', 'Art & Culture', 'Sports', 'Networking', 'Hackathons'
+        ];
 
-            await db.category.createMany({
-                data: categoryNames.map(name => ({ name })),
-            });
+        if (categoryCount < categoryNames.length) {
+            console.log("Bootstrapping categories...");
+            for (const name of categoryNames) {
+                await db.category.upsert({
+                    where: { name },
+                    update: {},
+                    create: { name },
+                });
+            }
             console.log("Categories bootstrapped.");
         }
 
-        // Gold Standard Event Boostrap (for internal payment testing)
         const eventCount = await db.event.count();
         if (eventCount === 0) {
-            console.log("Checking for users to bootstrap test event...");
-            const firstUser = await db.user.findFirst();
-            const firstCategory = await db.category.findFirst();
+            console.log("Database empty. Bootstrapping initial Aura ecosystem...");
 
-            if (firstUser && firstCategory) {
-                console.log("Bootstrapping Aura Gold Standard Event...");
-                await db.event.create({
+            // 1. Ensure System Admin exists
+            let admin = await db.user.findUnique({ where: { email: 'hello@aura.com' } });
+            if (!admin) {
+                admin = await db.user.create({
                     data: {
-                        title: 'Aura Genesis: The VIP Experience',
-                        description: 'This is the official Aura test event for validating payment flows and social features. Experience the premium glassmorphism vibe first-hand.',
-                        location: 'Aura Digital Arena, Mumbai',
-                        imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070',
-                        startDateTime: new Date(Date.now() + 86400000), // Tomorrow
-                        endDateTime: new Date(Date.now() + 172800000), // Day after
-                        price: '499',
-                        currency: 'INR',
-                        isFree: false,
-                        categoryId: firstCategory.id,
-                        organizerId: firstUser.id,
-                        url: '#'
+                        clerkId: 'system_admin_aura',
+                        email: 'hello@aura.com',
+                        username: 'aura_official',
+                        firstName: 'Aura',
+                        lastName: 'Official',
+                        photo: 'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=1080',
                     }
                 });
-                console.log("Gold Standard Event active linked to User:", firstUser.username);
-            } else {
-                console.warn("Bootstrap Pending: No user or category found. Event will be created upon first sign-in.");
             }
-        } else {
-            console.log("Aura already contains events. Skipping bootstrap.");
+
+            const musicCat = await db.category.findUnique({ where: { name: 'Music' } });
+            const techCat = await db.category.findUnique({ where: { name: 'Tech' } });
+
+            if (admin && musicCat && techCat) {
+                console.log("Seeding Aura Gold Standard Events...");
+                await db.event.createMany({
+                    data: [
+                        {
+                            title: 'Zomaland - Mumbai Edition',
+                            description: 'The ultimate food and entertainment carnival is back! Multi-stage music, curated food, and the best vibe in Mumbai.',
+                            location: 'Jio World Garden, BKC, Mumbai',
+                            imageUrl: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=1080',
+                            startDateTime: new Date('2026-03-15T10:00:00Z'),
+                            endDateTime: new Date('2026-03-16T22:00:00Z'),
+                            price: '499',
+                            isFree: false,
+                            url: 'https://zomato.com/zomaland',
+                            categoryId: musicCat.id,
+                            organizerId: admin.id
+                        },
+                        {
+                            title: 'Aura Genesis: The VIP Experience',
+                            description: 'The official launch event for our cosmic community. Network with the best curators and builders.',
+                            location: 'Aura Digital Arena, Bangalore',
+                            imageUrl: 'https://images.unsplash.com/photo-1540575861501-7ad0582373f3?q=80&w=1080',
+                            startDateTime: new Date(Date.now() + 86400000), // Tomorrow
+                            endDateTime: new Date(Date.now() + 172800000), // Day after
+                            price: '0',
+                            isFree: true,
+                            url: '#',
+                            categoryId: techCat.id,
+                            organizerId: admin.id
+                        }
+                    ]
+                });
+                console.log("Seeding complete.");
+            }
         }
     } catch (error) {
         console.error("Bootstrap failed:", error);

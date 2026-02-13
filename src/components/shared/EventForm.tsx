@@ -80,8 +80,9 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                     form.reset();
                     router.push(`/events/${newEvent.id}`);
                 }
-            } catch (error) {
-                console.log(error);
+            } catch (error: any) {
+                console.error("Submission Error:", error);
+                alert(`Error: ${error.message || "Failed to create event. Please try again."}`);
             }
         }
 
@@ -102,8 +103,9 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                     form.reset();
                     router.push(`/events/${updatedEvent.id}`);
                 }
-            } catch (error) {
-                console.log(error);
+            } catch (error: any) {
+                console.error("Update Error:", error);
+                alert(`Error: ${error.message || "Failed to update event. Please try again."}`);
             }
         }
     }
