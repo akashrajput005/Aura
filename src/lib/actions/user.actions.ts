@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { currentUser } from "@clerk/nextjs/server";
 
 export async function getUserByClerkId(clerkId: string) {
     try {
@@ -8,11 +9,27 @@ export async function getUserByClerkId(clerkId: string) {
             where: { clerkId },
         });
 
-        // Self-healing: If user exists in Clerk but not in DB, we should create him
-        // However, we usually rely on webhooks. This is a fail-safe.
+        // Self-healing / JIT Sync: If user exists in Clerk but not in DB, create them
         if (!user) {
-            console.log(`User ${clerkId} not found in DB. Check webhook logs.`);
-            return null;
+            console.log(`User ${clerkId} not found in DB. Attempting JIT Sync...`);
+
+            const clerkUser = await currentUser();
+
+            if (clerkUser && clerkUser.id === clerkId) {
+                user = await db.user.create({
+                    data: {
+                        clerkId: clerkUser.id,
+                        email: clerkUser.emailAddresses[0].emailAddress,
+                        username: clerkUser.username || clerkUser.emailAddresses[0].emailAddress.split('@')[0],
+                        firstName: clerkUser.firstName,
+                        lastName: clerkUser.lastName,
+                        photo: clerkUser.imageUrl,
+                    }
+                });
+                console.log(`JIT Sync successful for user: ${clerkId}`);
+            } else {
+                return null;
+            }
         }
 
         return JSON.parse(JSON.stringify(user));

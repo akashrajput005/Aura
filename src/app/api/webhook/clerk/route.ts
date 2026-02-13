@@ -52,13 +52,17 @@ export async function POST(req: Request) {
         const user = {
             clerkId: id,
             email: email_addresses[0].email_address,
-            username: username!,
+            username: username || email_addresses[0].email_address.split('@')[0],
             firstName: first_name,
             lastName: last_name,
             photo: image_url,
         }
 
-        const newUser = await db.user.create({ data: user });
+        const newUser = await db.user.upsert({
+            where: { clerkId: id },
+            update: user,
+            create: user,
+        });
 
         return NextResponse.json({ message: 'OK', user: newUser })
     }

@@ -11,26 +11,9 @@ const CreateEvent = async () => {
 
     if (!clerkId) redirect("/sign-in");
 
-    let user = await getUserByClerkId(clerkId);
+    const user = await getUserByClerkId(clerkId);
 
-    // If user doesn't exist in DB (webhook delay/failure), JIT Sync from Clerk
-    if (!user) {
-        const clerkUser = await currentUser();
-        if (clerkUser) {
-            user = await db.user.create({
-                data: {
-                    clerkId: clerkUser.id,
-                    email: clerkUser.emailAddresses[0].emailAddress,
-                    username: clerkUser.username || clerkUser.emailAddresses[0].emailAddress.split('@')[0],
-                    firstName: clerkUser.firstName,
-                    lastName: clerkUser.lastName,
-                    photo: clerkUser.imageUrl,
-                }
-            });
-        } else {
-            redirect("/?error=user_auth_failed");
-        }
-    }
+    if (!user) redirect("/?error=user_auth_failed");
 
     return (
         <div className="flex flex-col min-h-screen gradient-bg">
