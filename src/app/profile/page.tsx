@@ -24,11 +24,20 @@ const ProfilePage = async (props: { searchParams: Promise<{ [key: string]: strin
         return (
             <div className="flex-center min-h-screen gradient-bg flex-col gap-6 text-center px-6">
                 <Header />
-                <div className="p-8 rounded-3xl glassmorphism border border-white/10 mt-20">
+                <div className="p-8 rounded-3xl glassmorphism border border-white/10 mt-20 max-w-lg">
                     <h2 className="text-3xl font-bold text-white mb-2">Aura Sync Pending</h2>
                     <p className="text-white/60 mb-6">We&apos;re finalizing your cosmic profile. Try refreshing in a moment!</p>
+
+                    {/* PRODUCTION DEBUGGER OVERLAY */}
+                    <div className="text-left bg-black/40 p-4 rounded-xl border border-white/5 text-[10px] font-mono text-primary/70 mb-6">
+                        <p className="font-bold border-b border-white/10 mb-2 pb-1 uppercase tracking-widest">Aura Diagnostics</p>
+                        <p>• Clerk Session: <span className="text-emerald-400">{clerkId ? "ACTIVE" : "MISSING"}</span></p>
+                        <p>• Database Sync: <span className="text-red-400">PENDING</span></p>
+                        <p className="mt-2 text-white/40 italic">Check Vercel Environment Variables: DATABASE_URL, CLERK_SECRET_KEY</p>
+                    </div>
+
                     <Link href="/">
-                        <Button className="bg-primary hover:bg-primary/90 rounded-full px-8 py-6 text-lg">
+                        <Button className="bg-primary hover:bg-primary/90 rounded-full px-8 py-6 text-lg w-full">
                             Back to Home
                         </Button>
                     </Link>
