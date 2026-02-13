@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId   String   @unique
+  email     String   @unique
+  username  String   @unique
+  firstName String?
+  lastName  String?
+  photo     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  events OwnedEvent[]
+  orders Order[]
+}
+
+model OwnedEvent {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  location    String?
+  imageUrl    String
+  startDateTime DateTime @default(now())
+  endDateTime   DateTime @default(now())
+  price       String
+  isFree      Boolean  @default(false)
+  url         String?
+  
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  String   @db.ObjectId
+  
+  organizer   User     @relation(fields: [organizerId], references: [id])
+  organizerId String   @db.ObjectId
+
+  orders      Order[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Category {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  name   String   @unique
+  events OwnedEvent[]
+}
+
+model Order {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  stripeId  String   @unique
+  totalAmount String
+  
+  event     OwnedEvent @relation(fields: [eventId], references: [id])
+  eventId   String   @db.ObjectId
+  
+  buyer     User     @relation(fields: [buyerId], references: [id])
+  buyerId   String   @db.ObjectId
+}

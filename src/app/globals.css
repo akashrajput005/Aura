@@ -1,0 +1,165 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+:root {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 263.4 70% 50.4%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 263.4 70% 50.4%;
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.gradient-bg {
+  background: radial-gradient(circle at top right, rgba(124, 58, 237, 0.15), transparent),
+    radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.1), transparent),
+    #030303;
+}
+
+.glassmorphism {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wrapper {
+  @apply max-w-7xl lg:mx-auto p-5 md:px-10 xl:px-0 w-full;
+}
+
+.h1-bold {
+  @apply font-bold text-[40px] leading-[48px] lg:text-[72px] lg:leading-[82px] xl:text-[80px] xl:leading-[88px];
+}
+
+.h2-bold {
+  @apply font-bold text-[32px] leading-[40px] lg:text-[36px] lg:leading-[44px] xl:text-[40px] xl:leading-[48px];
+}
+
+.h3-bold {
+  @apply font-bold text-[24px] leading-[30px] lg:text-[28px] lg:leading-[36px];
+}
+
+.p-regular-24 {
+  @apply font-normal text-[24px] leading-[36px];
+}
+
+.p-regular-20 {
+  @apply font-normal text-[20px] leading-[30px];
+}
+
+.p-regular-18 {
+  @apply font-normal text-[18px] leading-[28px];
+}
+
+.p-regular-16 {
+  @apply font-normal text-[16px] leading-[24px];
+}
+
+.p-regular-14 {
+  @apply font-normal text-[14px] leading-[20px];
+}
+
+.p-medium-18 {
+  @apply font-medium text-[18px] leading-[28px];
+}
+
+.p-medium-16 {
+  @apply font-medium text-[16px] leading-[24px];
+}
+
+.p-medium-14 {
+  @apply font-medium text-[14px] leading-[20px];
+}
+
+.p-bold-20 {
+  @apply font-bold text-[20px] leading-[30px];
+}
+
+.p-bold-16 {
+  @apply font-bold text-[16px] leading-[24px];
+}
+
+.flex-center {
+  @apply flex justify-center items-center;
+}
+
+.flex-between {
+  @apply flex justify-between items-center;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #030303;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2D2D2D;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3D3D3D;
+}
