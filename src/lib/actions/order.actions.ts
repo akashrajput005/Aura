@@ -1,48 +1,38 @@
-"use server";
-
-import Stripe from 'stripe';
-import { redirect } from 'next/navigation';
+import Razorpay from 'razorpay';
 import { db } from "@/lib/db";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID!,
+    key_secret: process.env.RAZORPAY_KEY_SECRET!,
+});
 
-export const checkoutOrder = async (order: any) => {
-    const price = order.isFree ? 0 : Number(order.price) * 100;
+export const createRazorpayOrder = async (order: any) => {
+    const amount = order.isFree ? 0 : Number(order.price) * 100;
 
     try {
-        const session = await stripe.checkout.sessions.create({
-            line_items: [
-                {
-                    price_data: {
-                        currency: 'usd',
-                        unit_amount: price,
-                        product_data: {
-                            name: order.eventTitle,
-                        },
-                    },
-                    quantity: 1,
-                },
-            ],
+        const options = {
+            amount: amount,
+            currency: "INR",
+            receipt: `receipt_${Date.now()}`,
             metadata: {
                 eventId: order.eventId,
                 buyerId: order.buyerId,
-            },
-            mode: 'payment',
-            success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/profile`,
-            cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
-        });
+            }
+        };
 
-        redirect(session.url!);
+        const razorpayOrder = await razorpay.orders.create(options);
+        return JSON.parse(JSON.stringify(razorpayOrder));
     } catch (error) {
+        console.error(error);
         throw error;
     }
 }
 
-export async function createOrder(order: { stripeId: string, eventId: string, buyerId: string, totalAmount: string, createdAt: Date }) {
+export async function createOrder(order: { razorpayOrderId: string, eventId: string, buyerId: string, totalAmount: string }) {
     try {
         const newOrder = await db.order.create({
             data: {
-                stripeId: order.stripeId,
+                stripeId: order.razorpayOrderId, // We'll use stripeId field for razorpay id for now to avoid schema changes
                 eventId: order.eventId,
                 buyerId: order.buyerId,
                 totalAmount: order.totalAmount,
@@ -52,6 +42,31 @@ export async function createOrder(order: { stripeId: string, eventId: string, bu
         return JSON.parse(JSON.stringify(newOrder));
     } catch (error) {
         console.log(error);
+    }
+}
+
+export async function verifyRazorpayPayment({
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+    eventId,
+    buyerId,
+    totalAmount
+}: any) {
+    const crypto = await import('crypto');
+    const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!);
+    hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
+    const generated_signature = hmac.digest('hex');
+
+    if (generated_signature === razorpay_signature) {
+        return await createOrder({
+            razorpayOrderId: razorpay_order_id,
+            eventId,
+            buyerId,
+            totalAmount
+        });
+    } else {
+        throw new Error("Payment verification failed");
     }
 }
 
