@@ -41,8 +41,9 @@ export async function getUserByClerkId(clerkId: string) {
         }
 
         return JSON.parse(JSON.stringify(user));
-    } catch (error) {
-        console.log("getUserByClerkId Error:", error);
+    } catch (error: any) {
+        console.error(`[JIT] CRITICAL DATABASE ERROR for ${clerkId}:`, error.message || error);
+        if (error.code) console.error(`[JIT] Error Code: ${error.code}`);
         return null;
     }
 }

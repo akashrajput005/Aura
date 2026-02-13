@@ -8,6 +8,10 @@ import MobileNav from "./MobileNav"
 const Header = () => {
     return (
         <header className="w-full border-b border-white/10 bg-black/20 backdrop-blur-md sticky top-0 z-50">
+            {/* GLOBAL DIAGNOSTIC BANNER */}
+            <div className="w-full bg-primary/20 py-1 text-[8px] font-mono text-center text-primary/80 uppercase tracking-[0.2em] border-b border-white/5">
+                Aura Protocol v2.0-RECOVERY • Node: Production • Status: Active
+            </div>
             <div className="wrapper flex items-center justify-between px-6 md:px-12 h-20">
                 <Link href="/" className="flex items-center gap-2">
                     <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/40">
