@@ -2,6 +2,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
+import { bootstrapAura } from "@/lib/actions/bootstrap.actions";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -22,6 +23,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Initialize essential data
+  bootstrapAura();
+
   return (
     <ClerkProvider>
       <html lang="en">

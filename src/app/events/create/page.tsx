@@ -6,6 +6,8 @@ import { getUserByClerkId } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 const CreateEvent = async () => {
     const { userId: clerkId } = await auth();
 

@@ -1,5 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { getUserByClerkId } from '@/lib/actions/user.actions'
+
+export const dynamic = "force-dynamic";
 import { getEventsByUser } from '@/lib/actions/event.actions'
 import { getOrdersByUser } from '@/lib/actions/order.actions'
 import Header from "@/components/shared/Header";
